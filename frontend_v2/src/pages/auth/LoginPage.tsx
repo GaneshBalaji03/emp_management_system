@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
                 <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl overflow-hidden shadow-black/40">
                     {/* Role Toggle */}
                     <div className="flex p-1.5 bg-slate-950/50 m-6 rounded-2xl border border-slate-800/50">
-                        {(['EMPLOYEE', 'HR', 'ADMIN'] as const).map((r) => (
+                        {(['EMPLOYEE', 'HR'] as const).map((r) => (
                             <button
                                 key={r}
                                 onClick={() => setRole(r)}
@@ -136,9 +136,8 @@ const LoginPage: React.FC = () => {
                 </div>
 
                 {/* Guest Credentials for Demo */}
-                <div className="mt-8 grid grid-cols-3 gap-4">
+                <div className="mt-8 grid grid-cols-2 gap-4">
                     {[
-                        { label: 'Admin', val: 'admin@example.com' },
                         { label: 'HR', val: 'hr@example.com' },
                         { label: 'Emp', val: 'emp@example.com' }
                     ].map(cred => (
