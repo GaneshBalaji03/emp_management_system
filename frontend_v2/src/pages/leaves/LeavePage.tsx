@@ -24,10 +24,28 @@ const LeavePage: React.FC = () => {
         { type: 'Privilege Leave', used: 0, total: 15, color: 'indigo' },
     ];
 
-    const requests = [
+    const [requests, setRequests] = useState([
         { id: '1', type: 'Sick Leave', from: 'Mar 10', to: 'Mar 12', days: 3, status: 'PENDING', reason: 'Fever and cold', employee: 'Ganesh Balaji' },
         { id: '2', type: 'Vacation', from: 'Apr 20', to: 'Apr 25', days: 6, status: 'APPROVED', reason: 'Family trip', employee: 'Sarah Miller' },
-    ];
+    ]);
+
+    const handleStatusChange = (id: string, newStatus: string) => {
+        setRequests(reqs => reqs.map(r => r.id === id ? { ...r, status: newStatus } : r));
+    };
+
+    const handleApplyLeave = () => {
+        const newReq = {
+            id: Date.now().toString(),
+            type: 'Casual Leave',
+            from: 'Mar 15',
+            to: 'Mar 16',
+            days: 2,
+            status: 'PENDING',
+            reason: 'Personal work',
+            employee: user?.email?.split('@')[0] || 'Employee'
+        };
+        setRequests([newReq, ...requests]);
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -36,7 +54,9 @@ const LeavePage: React.FC = () => {
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight">Leave <span className="text-indigo-600">Management</span></h1>
                     <p className="text-slate-500 font-medium">Plan your time off and track your balances.</p>
                 </div>
-                <button className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all transform active:scale-95 group">
+                <button
+                    onClick={handleApplyLeave}
+                    className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all transform active:scale-95 group">
                     <Plus className="w-5 h-5" />
                     <span>Apply for Leave</span>
                 </button>
@@ -101,7 +121,9 @@ const LeavePage: React.FC = () => {
                                     <div className="flex items-center space-x-6">
                                         <div className={cn(
                                             "w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner",
-                                            req.status === 'APPROVED' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                                            req.status === 'APPROVED' ? "bg-emerald-50 text-emerald-600" :
+                                                req.status === 'REJECTED' ? "bg-rose-50 text-rose-600" :
+                                                    "bg-amber-50 text-amber-600"
                                         )}>
                                             {req.type[0]}
                                         </div>
@@ -120,10 +142,14 @@ const LeavePage: React.FC = () => {
                                         <StatusBadge status={req.status} />
                                         {isAdminOrHR && req.status === 'PENDING' && (
                                             <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100">
-                                                <button className="p-2 border border-emerald-100 bg-emerald-50 text-emerald-600 rounded-lg shadow-sm hover:bg-emerald-100">
+                                                <button
+                                                    onClick={() => handleStatusChange(req.id, 'APPROVED')}
+                                                    className="p-2 border border-emerald-100 bg-emerald-50 text-emerald-600 rounded-lg shadow-sm hover:bg-emerald-100">
                                                     <CheckCircle2 className="w-4 h-4" />
                                                 </button>
-                                                <button className="p-2 border border-rose-100 bg-rose-50 text-rose-600 rounded-lg shadow-sm hover:bg-rose-100">
+                                                <button
+                                                    onClick={() => handleStatusChange(req.id, 'REJECTED')}
+                                                    className="p-2 border border-rose-100 bg-rose-50 text-rose-600 rounded-lg shadow-sm hover:bg-rose-100">
                                                     <XCircle className="w-4 h-4" />
                                                 </button>
                                             </div>

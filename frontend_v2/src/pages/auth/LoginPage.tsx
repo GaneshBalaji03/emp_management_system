@@ -45,9 +45,9 @@ const LoginPage: React.FC = () => {
                         <Shield className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-white tracking-tight leading-tight">
-                        Portal <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Enterprise</span>
+                        ZDotApps <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Portal</span>
                     </h1>
-                    <p className="text-slate-400 mt-2 font-medium">Production-Grade Employee Management</p>
+                    <p className="text-slate-400 mt-2 font-medium">Company Employee Portal</p>
                 </div>
 
                 <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl overflow-hidden shadow-black/40">

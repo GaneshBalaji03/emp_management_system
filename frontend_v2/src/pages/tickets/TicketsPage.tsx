@@ -21,7 +21,7 @@ const TicketsPage: React.FC = () => {
     const { user } = useAuth();
     const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR';
 
-    const tickets = [
+    const [tickets, setTickets] = useState([
         {
             id: 'T-1024',
             title: 'Salary Slip Missing for Feb 2026',
@@ -49,7 +49,25 @@ const TicketsPage: React.FC = () => {
             date: 'Mar 02',
             employee: 'Alice Smith'
         },
-    ];
+    ]);
+
+    const handleAddTicket = () => {
+        const newTicket = {
+            id: `T-${1026 + tickets.length}`,
+            title: 'Software License Request',
+            category: 'IT Support',
+            priority: 'MEDIUM',
+            status: 'OPEN',
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+            employee: user?.email?.split('@')[0] || 'Employee'
+        };
+        setTickets([newTicket, ...tickets]);
+    };
+
+    const handleResolve = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setTickets(tix => tix.map(t => t.id === id ? { ...t, status: 'RESOLVED' } : t));
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -58,7 +76,9 @@ const TicketsPage: React.FC = () => {
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight">Helpdesk & <span className="text-indigo-600">Tickets</span></h1>
                     <p className="text-slate-500 font-medium">Raise requests and track their resolution status.</p>
                 </div>
-                <button className="flex items-center space-x-2 bg-indigo-600 text-white px-6 py-3 rounded-2xl font-black shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all transform active:scale-95 group">
+                <button
+                    onClick={handleAddTicket}
+                    className="flex items-center space-x-2 bg-indigo-600 text-white px-6 py-3 rounded-2xl font-black shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all transform active:scale-95 group">
                     <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
                     <span>New Ticket</span>
                 </button>
@@ -164,6 +184,15 @@ const TicketsPage: React.FC = () => {
                                             </td>
                                             <td className="px-8 py-5 text-right">
                                                 <div className="flex items-center justify-end space-x-2">
+                                                    {t.status !== 'RESOLVED' && isAdminOrHR && (
+                                                        <button
+                                                            onClick={(e) => handleResolve(t.id, e)}
+                                                            className="p-2 text-emerald-400 hover:text-emerald-600 transition-colors tooltip"
+                                                            title="Mark as Resolved"
+                                                        >
+                                                            <CheckCircle2 className="w-5 h-5" />
+                                                        </button>
+                                                    )}
                                                     <button className="p-2 text-slate-300 hover:text-indigo-600 transition-colors">
                                                         <MessageCircle className="w-5 h-5" />
                                                     </button>

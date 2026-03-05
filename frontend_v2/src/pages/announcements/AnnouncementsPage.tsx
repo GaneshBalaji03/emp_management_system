@@ -18,7 +18,7 @@ const AnnouncementsPage: React.FC = () => {
     const { user } = useAuth();
     const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR';
 
-    const announcements = [
+    const [announcements, setAnnouncements] = useState([
         {
             id: '1',
             title: 'Annual Performance Review 2026',
@@ -46,7 +46,20 @@ const AnnouncementsPage: React.FC = () => {
             tag: 'SOCIAL',
             isPinned: false
         },
-    ];
+    ]);
+
+    const handleAddAnnouncement = () => {
+        const newAnn = {
+            id: Date.now().toString(),
+            title: 'New Platform Update ' + new Date().toLocaleTimeString(),
+            content: 'We just pushed a new update to the internal portal. Please clear your cache and enjoy the new features!',
+            author: user?.email?.split('@')[0] || 'Admin',
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+            tag: 'SYSTEM',
+            isPinned: false
+        };
+        setAnnouncements([newAnn, ...announcements]);
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -56,7 +69,9 @@ const AnnouncementsPage: React.FC = () => {
                     <p className="text-slate-500 font-medium">Stay updated with the latest news and policies.</p>
                 </div>
                 {isAdminOrHR && (
-                    <button className="flex items-center space-x-2 bg-slate-900 text-white px-6 py-3 rounded-2xl font-black shadow-xl shadow-slate-900/10 hover:bg-indigo-600 transition-all group">
+                    <button
+                        onClick={handleAddAnnouncement}
+                        className="flex items-center space-x-2 bg-slate-900 text-white px-6 py-3 rounded-2xl font-black shadow-xl shadow-slate-900/10 hover:bg-indigo-600 transition-all group">
                         <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
                         <span>Post Update</span>
                     </button>

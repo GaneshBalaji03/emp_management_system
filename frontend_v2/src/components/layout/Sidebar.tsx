@@ -39,9 +39,9 @@ const Sidebar: React.FC = () => {
         <aside className="w-64 bg-slate-900 text-white flex flex-col h-screen sticky top-0 border-r border-slate-800 shadow-xl">
             <div className="p-6 flex items-center space-x-3 bg-slate-900/50 border-b border-slate-800">
                 <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <span className="text-xl font-bold">E</span>
+                    <span className="text-xl font-bold">Z</span>
                 </div>
-                <h1 className="text-xl font-bold tracking-tight">Portal <span className="text-indigo-400">v2</span></h1>
+                <h1 className="text-xl font-bold tracking-tight">ZDotApps <span className="text-indigo-400">Portal</span></h1>
             </div>
 
             <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1 custom-scrollbar">

@@ -33,7 +33,9 @@ const Header: React.FC = () => {
                 <div className="flex items-center space-x-3 pl-2">
                     <div className="text-right hidden sm:block leading-none">
                         <p className="text-sm font-semibold text-gray-900 leading-none mb-1">
-                            Welcome, <span className="text-indigo-600">Admin</span>
+                            Welcome, <span className="text-indigo-600 capitalize">
+                                {user?.role === 'HR' ? 'HR' : user?.email?.split('@')[0]}
+                            </span>
                         </p>
                         <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                     </div>
