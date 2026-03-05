@@ -8,7 +8,8 @@ import {
     CheckCircle2,
     AlertCircle,
     TrendingUp,
-    ArrowUpRight
+    ArrowUpRight,
+    Megaphone
 } from 'lucide-react';
 import { useAuth } from '../../api/AuthContext';
 import { cn } from '../../utils/cn';
