@@ -40,6 +40,7 @@ ALLOWED_HOSTS = ['localhost','127.0.0.1', 'localhost:5173']
 INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'hackathon',
+    'employees',
 ]
 
 MIDDLEWARE = [

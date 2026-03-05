@@ -7,10 +7,9 @@ export function apiLogin({ username, password }) {
   })
 }
 
-export function apiMe({ token }) {
+export function apiMe() {
   return httpJson('/api/home', {
     method: 'GET',
-    token,
   })
 }
 

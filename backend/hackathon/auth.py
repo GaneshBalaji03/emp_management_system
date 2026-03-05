@@ -38,7 +38,8 @@ def post_form_json(*, url: str, payload: dict[str, str], timeout: int = 15) -> d
             status = getattr(resp, 'status', None) or resp.getcode()
             body = resp.read().decode('utf-8')
             if status < 200 or status >= 300:
-                raise ExternalAuthError(f'External auth returned HTTP {status}')
+                # include response body to aid debugging when upstream returns 5xx/4xx
+                raise ExternalAuthError(f"External auth returned HTTP {status}: {body}")
             try:
                 parsed = json.loads(body)
             except json.JSONDecodeError as exc:
@@ -47,6 +48,13 @@ def post_form_json(*, url: str, payload: dict[str, str], timeout: int = 15) -> d
                 raise ExternalAuthError('External auth returned invalid response')
             return parsed
     except urllib.error.HTTPError as exc:
+        # attempt to include the response body from the HTTPError for diagnostics
+        try:
+            body = exc.read().decode('utf-8')
+        except Exception:
+            body = None
+        if body:
+            raise ExternalAuthError(f"External auth returned HTTP {exc.code}: {body}") from exc
         raise ExternalAuthError(f'External auth returned HTTP {exc.code}') from exc
     except urllib.error.URLError as exc:
         raise ExternalAuthError('Unable to reach external auth service') from exc

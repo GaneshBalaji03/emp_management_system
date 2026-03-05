@@ -1,6 +1,8 @@
-/* -------------------------------
-   Page Layout
--------------------------------- */
+/* ═══════════════════════════════════════════════
+   AUTH PAGE — Login / Register / Forgot Password
+   ═══════════════════════════════════════════════ */
+
+/* ── Page Layout ── */
 .page-wrapper {
     width: 100%;
     min-height: 100vh;
@@ -9,55 +11,45 @@
     justify-content: flex-end;
 }
 
-/* -------------------------------
-   Glass Panel
--------------------------------- */
+/* ── Glass Panel ── */
 .glass-panel {
     width: clamp(320px, 34vw, 520px);
     min-height: 100vh;
     padding: clamp(20px, 3vw, 40px);
     background: rgba(41, 40, 40, 0.66);
     backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(15px);
     border-left: 1px solid var(--primary-subtle);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* -------------------------------
-   Glass Content (Centered)
--------------------------------- */
+/* ── Glass Content ── */
 .glass-content {
     width: 100%;
     max-width: 420px;
 }
 
-/* -------------------------------
-   Logo
--------------------------------- */
+/* ── Logo ── */
 .logo {
     margin-bottom: 36px;
     display: flex;
     align-items: center;
-    justify-content: center
+    justify-content: center;
 }
 
-/* -------------------------------
-   Typography
--------------------------------- */
+/* ── Typography ── */
 label {
     font-family: 'Inter', sans-serif;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--light-4);
     margin-bottom: 8px;
     display: block;
 }
 
-/* -------------------------------
-   Form Fields
--------------------------------- */
+/* ── Form Fields ── */
 .field {
     margin-bottom: 24px;
 }
@@ -67,10 +59,11 @@ label {
     padding: 12px 14px;
     font-size: 16px;
     font-family: 'Mulish', sans-serif;
-    border-radius: 4px;
-    border: 1px solid var(--light-3);
-    background: transparent;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.06);
     color: var(--light-1);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .field select {
@@ -78,10 +71,11 @@ label {
     padding: 12px 14px;
     font-size: 16px;
     font-family: 'Mulish', sans-serif;
-    border-radius: 4px;
-    border: 1px solid var(--light-3);
-    background: transparent;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.06);
     color: var(--light-1);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .field input::placeholder {
@@ -91,18 +85,16 @@ label {
 .field input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(51, 119, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(51, 119, 255, 0.2);
 }
 
-/* -------------------------------
-   Get Key Section
--------------------------------- */
+/* ── Get Key Section ── */
 .get-key {
     display: flex;
     align-items: center;
     gap: 12px;
     font-size: 14px;
-    color: var(--dark-2);
+    color: var(--dark-4);
     margin-bottom: 16px;
 }
 
@@ -110,12 +102,17 @@ label {
     padding: 0;
     border: none;
     background: transparent;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s;
+}
+
+.key-icon:hover {
+    transform: scale(1.15);
 }
 
 .key-icon img {
@@ -125,13 +122,11 @@ label {
     display: block;
 }
 
-/* -------------------------------
-   OTP Inputs
--------------------------------- */
+/* ── OTP Inputs ── */
 .otp-boxes {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 14px;
     margin-top: 8px;
 }
 
@@ -139,28 +134,32 @@ label {
     width: 44px;
     height: 44px;
     text-align: center;
-    font-size: 16px;
-    border-radius: 4px;
-    border: 1px solid var(--light-3);
+    font-size: 18px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .otp-boxes input:focus {
     border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(51, 119, 255, 0.2);
 }
 
-/* -------------------------------
-   OR Divider Text
--------------------------------- */
+/* ── OR Divider ── */
 .or-text {
     text-align: center;
     font-size: 12px;
-    color: var(--light-2);
+    color: rgba(255, 255, 255, 0.4);
     margin: 24px 0;
+    font-weight: 600;
+    letter-spacing: 0.1em;
 }
 
-/* -------------------------------
-   Password Field
--------------------------------- */
+/* ── Password Field ── */
 .password {
     position: relative;
 }
@@ -188,6 +187,11 @@ label {
     justify-content: center;
     color: rgba(255, 255, 255, 0.75);
     cursor: pointer;
+    transition: color 0.2s;
+}
+
+.password-toggle:hover {
+    color: var(--primary-light);
 }
 
 .password-toggle:disabled {
@@ -219,10 +223,15 @@ label {
     border: none;
     background: transparent;
     font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
     color: var(--primary-light);
     cursor: pointer;
+    transition: color 0.2s;
+}
+
+.forgot-password-under:hover {
+    color: var(--primary);
 }
 
 .forgot-password-under:disabled {
@@ -237,7 +246,7 @@ label {
     gap: 6px;
     margin-bottom: 12px;
     font-size: 13px;
-    color: var(--light-2);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .create-account-link {
@@ -249,6 +258,11 @@ label {
     font-weight: 600;
     color: var(--primary-light);
     cursor: pointer;
+    transition: color 0.2s;
+}
+
+.create-account-link:hover {
+    color: var(--primary);
 }
 
 .create-account-link:disabled {
@@ -256,24 +270,25 @@ label {
     opacity: 0.6;
 }
 
-/* -------------------------------
-   Login Button
--------------------------------- */
+/* ── Login Button ── */
 .auth-btn {
     width: 100%;
     padding: 14px 32px;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
     font-weight: 600;
-    color: #fff;
+    color: var(--white);
     background: var(--primary);
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
 .auth-btn:hover {
     background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(51, 119, 255, 0.35);
 }
 
 .auth-btn:focus {
@@ -281,9 +296,14 @@ label {
     box-shadow: 0 0 0 3px rgba(51, 119, 255, 0.3);
 }
 
-/* -------------------------------
-   Create Account
--------------------------------- */
+.auth-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── Create Account ── */
 .create-account {
     margin-top: 24px;
     text-align: center;
@@ -292,9 +312,7 @@ label {
     cursor: pointer;
 }
 
-/* -------------------------------
-   Responsive
--------------------------------- */
+/* ── Responsive ── */
 @media (max-width: 768px) {
     .glass-panel {
         width: 100%;
@@ -306,7 +324,7 @@ label {
     }
 
     .otp-boxes {
-        gap: 12px;
+        gap: 10px;
     }
 }
 
@@ -316,7 +334,7 @@ label {
     }
 
     .otp-boxes {
-        gap: 10px;
+        gap: 8px;
     }
 
     .otp-boxes input {

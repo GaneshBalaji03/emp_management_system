@@ -161,7 +161,13 @@ function AuthPage() {
       }
       navigate('/home')
     } catch (err) {
-      setErrorMessage(err?.message || 'Login failed')
+      // if the server failed due to missing auth configuration or other
+      // internal issue, show a generic message rather than the raw text.
+      if (err?.status === 500) {
+        setErrorMessage('Login service is currently unavailable. Please try again later.')
+      } else {
+        setErrorMessage(err?.message || 'Login failed')
+      }
     } finally {
       setSubmitting(false)
     }

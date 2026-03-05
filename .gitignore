@@ -1,0 +1,21 @@
+node_modules/
+venv/
+.venv/
+__pycache__/
+.env
+dist/
+.DS_Store
+*.pyc
+.antigravityignore
+# Secrets
+.env
+
+# Python
+.venv/
+.venv-1/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+dist/
