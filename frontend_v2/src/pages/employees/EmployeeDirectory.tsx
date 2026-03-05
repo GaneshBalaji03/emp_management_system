@@ -18,14 +18,13 @@ import { StatusBadge } from '../../components/common/StatusBadge';
 import { cn } from '../../utils/cn';
 import AddEmployeeModal from './AddEmployeeModal';
 
-const mockEmployees = [
-    { id: '1', name: 'Ganesh Balaji', email: 'ganesh@example.com', role: 'Software Engineer', dept: 'Engineering', status: 'ACTIVE', doj: '2023-01-15' },
-    { id: '2', name: 'Sarah Miller', email: 'sarah@example.com', role: 'HR Manager', dept: 'HR', status: 'ACTIVE', doj: '2022-06-10' },
-    { id: '3', name: 'Michael Chen', email: 'michael@example.com', role: 'Product Lead', dept: 'Product', status: 'INACTIVE', doj: '2021-11-20' },
-    { id: '4', name: 'Emma Wilson', email: 'emma@example.com', role: 'UI Designer', dept: 'Design', status: 'ACTIVE', doj: '2023-05-01' },
-];
-
 const EmployeeDirectory: React.FC = () => {
+    const [employees, setEmployees] = useState([
+        { id: '1', name: 'Ganesh Balaji', email: 'ganesh@example.com', role: 'Software Engineer', dept: 'Engineering', status: 'ACTIVE', doj: '2023-01-15' },
+        { id: '2', name: 'Sarah Miller', email: 'sarah@example.com', role: 'HR Manager', dept: 'HR', status: 'ACTIVE', doj: '2022-06-10' },
+        { id: '3', name: 'Michael Chen', email: 'michael@example.com', role: 'Product Lead', dept: 'Product', status: 'INACTIVE', doj: '2021-11-20' },
+        { id: '4', name: 'Emma Wilson', email: 'emma@example.com', role: 'UI Designer', dept: 'Design', status: 'ACTIVE', doj: '2023-05-01' },
+    ]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -34,8 +33,8 @@ const EmployeeDirectory: React.FC = () => {
             <AddEmployeeModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSuccess={() => {
-                    console.log('Employee added successfully');
+                onSuccess={(newEmp) => {
+                    setEmployees([newEmp, ...employees]);
                     setIsModalOpen(false);
                 }}
             />
@@ -95,12 +94,12 @@ const EmployeeDirectory: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {mockEmployees.map((emp) => (
+                            {employees.map((emp) => (
                                 <tr key={emp.id} className="hover:bg-indigo-50/30 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center">
                                             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-400 mr-4 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors capitalize">
-                                                {emp.name.split(' ').map(n => n[0]).join('')}
+                                                {emp.name.split(' ').map((n: string) => n[0]).join('')}
                                             </div>
                                             <div>
                                                 <p className="font-bold text-slate-900 leading-tight">{emp.name}</p>

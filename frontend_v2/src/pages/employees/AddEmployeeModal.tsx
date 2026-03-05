@@ -5,7 +5,7 @@ import { cn } from '../../utils/cn';
 interface AddEmployeeModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSuccess: () => void;
+    onSuccess: (employee: any) => void;
 }
 
 const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, onSuccess }) => {
@@ -34,7 +34,16 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
         // Mock API call
         setTimeout(() => {
             setLoading(false);
-            onSuccess();
+            const newEmp = {
+                id: Math.random().toString(36).substr(2, 9),
+                name: formData.name,
+                email: formData.email,
+                role: formData.designation,
+                dept: formData.department,
+                status: 'ACTIVE',
+                doj: formData.doj || new Date().toISOString().split('T')[0]
+            };
+            onSuccess(newEmp);
             onClose();
         }, 1500);
     };
