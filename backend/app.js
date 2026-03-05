@@ -27,6 +27,20 @@ function initializeDatabase() {
       start_date DATE NOT NULL,
       end_date DATE
     )`,
+    `CREATE TABLE IF NOT EXISTS employees (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      emp_id VARCHAR(20) UNIQUE,
+      first_name VARCHAR(100),
+      last_name VARCHAR(100),
+      email VARCHAR(150),
+      department VARCHAR(100),
+      designation VARCHAR(100),
+      joining_date DATE,
+      exit_date DATE,
+      status VARCHAR(20),
+      created_at DATETIME,
+      updated_at DATETIME
+    )`,
     `CREATE TABLE IF NOT EXISTS emp_bank_info (
       emp_bank_id INT PRIMARY KEY AUTO_INCREMENT,
       emp_id INT,
@@ -195,15 +209,14 @@ app.post('/create-sample-data', (req, res) => {
 });
 
 function insertSampleData() {
-  // Check if data already exists
+  // Populate emp_master if empty
   db.query('SELECT COUNT(*) as count FROM emp_master', (err, results) => {
     if (err) {
-      console.error('Error checking data:', err);
+      console.error('Error checking emp_master:', err);
       return;
     }
 
     if (results[0].count === 0) {
-      // Insert sample employee data
       const sampleEmployees = [
         [1, 'John', 'M', 'Doe', '2023-01-15', null],
         [2, 'Jane', 'A', 'Smith', '2023-02-20', null],
@@ -213,16 +226,31 @@ function insertSampleData() {
       ];
 
       const insertQuery = 'INSERT INTO emp_master (emp_id, first_name, middle_name, last_name, start_date, end_date) VALUES ?';
-
       db.query(insertQuery, [sampleEmployees], (err, result) => {
-        if (err) {
-          console.error('Error inserting sample data:', err);
-        } else {
-          console.log(`Sample data inserted: ${result.affectedRows} employees`);
-        }
+        if (err) console.error('Error inserting emp_master sample data:', err);
+        else console.log(`emp_master sample inserted: ${result.affectedRows}`);
       });
-    } else {
-      console.log('Sample data already exists');
+    }
+  });
+
+  // Populate employees table if empty
+  db.query('SELECT COUNT(*) as count FROM employees', (err, results) => {
+    if (err) {
+      console.error('Error checking employees table:', err);
+      return;
+    }
+
+    if (results[0].count === 0) {
+      const sampleEmployees = [
+        ['EMP001', 'Bhanu', 'Teja', 'bteja1055@gmail.com', 'IT', 'Developer', '2023-01-15', null, 'ACTIVE'],
+        ['EMP002', 'Alice', 'M', 'alice@example.com', 'HR', 'Manager', '2022-05-10', null, 'ACTIVE'],
+        ['EMP003', 'Bob', 'R', 'bob@example.com', 'Sales', 'Salesperson', '2021-03-22', '2024-01-31', 'EXITED']
+      ];
+      const insertQuery = 'INSERT INTO employees (emp_id, first_name, last_name, email, department, designation, joining_date, exit_date, status) VALUES ?';
+      db.query(insertQuery, [sampleEmployees], (err, result) => {
+        if (err) console.error('Error inserting employees sample data:', err);
+        else console.log(`employees table sample inserted: ${result.affectedRows}`);
+      });
     }
   });
 }
@@ -237,30 +265,33 @@ app.get('/api/home', (req, res) => {
 
 app.get('/api/employees', (req, res) => {
   const { status, search } = req.query;
-  let query = 'SELECT emp_id, first_name, middle_name, last_name, start_date, end_date FROM emp_master';
-  let params = [];
+  let query = 'SELECT emp_id, first_name, last_name, email, department, designation, joining_date, exit_date, status FROM employees';
+  let filters = [];
 
   if (search) {
-    if (!isNaN(search)) {
-      query += ' WHERE emp_id = ? OR first_name LIKE ? OR last_name LIKE ?';
-      params = [parseInt(search), `%${search}%`, `%${search}%`];
-    } else {
-      query += ' WHERE first_name LIKE ? OR last_name LIKE ? OR middle_name LIKE ?';
-      params = [`%${search}%`, `%${search}%`, `%${search}%`];
-    }
+    const like = `%${search}%`;
+    // emp_id is string so treat as LIKE
+    query += ' WHERE emp_id LIKE ? OR first_name LIKE ? OR last_name LIKE ?';
+    filters = [like, like, like];
   }
 
-  db.query(query, params, (err, results) => {
+  if (status && status !== 'ALL') {
+    query += search ? ' AND' : ' WHERE';
+    query += ' status = ?';
+    filters.push(status);
+  }
+
+  db.query(query, filters, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
 
     const data = results.map(emp => ({
       emp_id: emp.emp_id,
       first_name: emp.first_name,
-      middle_name: emp.middle_name,
+      middle_name: emp.middle_name || '',
       last_name: emp.last_name,
-      start_date: emp.start_date ? emp.start_date.toISOString().split('T')[0] : null,
-      end_date: emp.end_date ? emp.end_date.toISOString().split('T')[0] : null,
-      status: emp.end_date && emp.end_date <= new Date() ? 'EXITED' : 'ACTIVE'
+      start_date: emp.joining_date ? emp.joining_date.toISOString().split('T')[0] : null,
+      end_date: emp.exit_date ? emp.exit_date.toISOString().split('T')[0] : null,
+      status: emp.status || 'ACTIVE'
     }));
 
     res.json(data);
@@ -270,10 +301,10 @@ app.get('/api/employees', (req, res) => {
 app.get('/api/employees/reports/headcount', (req, res) => {
   const today = new Date().toISOString().split('T')[0];
 
-  db.query('SELECT COUNT(*) as total FROM emp_master', (err, totalResult) => {
+  db.query('SELECT COUNT(*) as total FROM employees', (err, totalResult) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    db.query('SELECT COUNT(*) as active FROM emp_master WHERE end_date IS NULL OR end_date > ?', [today], (err, activeResult) => {
+    db.query('SELECT COUNT(*) as active FROM employees WHERE exit_date IS NULL OR exit_date > ?', [today], (err, activeResult) => {
       if (err) return res.status(500).json({ error: err.message });
 
       const total = totalResult[0].total;
@@ -287,6 +318,18 @@ app.get('/api/employees/reports/headcount', (req, res) => {
         as_of: today
       });
     });
+  });
+});
+
+
+// profile endpoint for individual employee
+app.get('/api/employees/:empId/profile', (req, res) => {
+  const empId = req.params.empId;
+  db.query('SELECT * FROM employees WHERE emp_id = ?', [empId], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Employee not found' });
+    // return full row under "personal"
+    res.json({ personal: results[0] });
   });
 });
 

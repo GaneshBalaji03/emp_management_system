@@ -105,8 +105,11 @@ function ProfileModal({ empId, onClose, token, onEdit, onExit, onDelete }) {
   )
 
   if (!data) return null
-  const p = data.personal || {}
+  const p = data.personal || data || {}
   const bg = avatarColor(p.first_name)
+
+  // build dynamic rows for any fields on the personal object
+  const personalEntries = Object.entries(p).filter(([k,v]) => v !== undefined && k !== 'middle_name')
 
   return (
     <div className="emp-modal-backdrop" onClick={onClose}>
@@ -116,7 +119,7 @@ function ProfileModal({ empId, onClose, token, onEdit, onExit, onDelete }) {
           <div className="profile-avatar-large">{(p.first_name?.[0] || '?').toUpperCase()}</div>
           <div className="flex-grow-1">
             <h3 className="mb-0 fw-bold">{p.first_name} {p.middle_name ? p.middle_name + ' ' : ''}{p.last_name}</h3>
-            <div className="opacity-75 mt-1">ID: {p.emp_id}  ·  Joined: {p.start_date || '—'}</div>
+            <div className="opacity-75 mt-1">ID: {p.emp_id}  ·  Joined: {p.joining_date || p.start_date || '—'}</div>
             <div className="mt-2"><span className={`emp-badge ${p.status === 'ACTIVE' ? 'emp-badge-active' : 'emp-badge-exited'}`} style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>{p.status}</span></div>
           </div>
           <button className="btn-close btn-close-white position-absolute top-0 end-0 m-3" onClick={onClose} />
@@ -137,12 +140,12 @@ function ProfileModal({ empId, onClose, token, onEdit, onExit, onDelete }) {
               <div className="profile-section">
                 <div className="section-title"><i className="bi bi-person-fill text-primary me-2" />Personal Details</div>
                 <div className="row g-2">
-                  <div className="col-6 info-item"><label>First Name</label><div className="value">{p.first_name || '—'}</div></div>
-                  <div className="col-6 info-item"><label>Last Name</label><div className="value">{p.last_name || '—'}</div></div>
-                  <div className="col-6 info-item"><label>Middle Name</label><div className="value">{p.middle_name || '—'}</div></div>
-                  <div className="col-6 info-item"><label>Start Date</label><div className="value">{p.start_date || '—'}</div></div>
-                  <div className="col-6 info-item"><label>Status</label><div className="value"><span className={`emp-badge ${p.status === 'ACTIVE' ? 'emp-badge-active' : 'emp-badge-exited'}`}>{p.status}</span></div></div>
-                  {p.end_date && <div className="col-6 info-item"><label>Exit Date</label><div className="value text-danger">{p.end_date}</div></div>}
+                  {personalEntries.map(([key, value]) => (
+                    <div key={key} className="col-6 info-item">
+                      <label>{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</label>
+                      <div className="value">{String(value) || '—'}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
