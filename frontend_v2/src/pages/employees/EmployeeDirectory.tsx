@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     Search,
     Filter,
@@ -19,6 +20,7 @@ import { cn } from '../../utils/cn';
 import AddEmployeeModal from './AddEmployeeModal';
 
 const EmployeeDirectory: React.FC = () => {
+    const location = useLocation();
     const [employees, setEmployees] = useState([
         { id: '1', name: 'Ganesh Balaji', email: 'ganesh@example.com', role: 'Software Engineer', dept: 'Engineering', status: 'ACTIVE', doj: '2023-01-15' },
         { id: '2', name: 'Sarah Miller', email: 'sarah@example.com', role: 'HR Manager', dept: 'HR', status: 'ACTIVE', doj: '2022-06-10' },
@@ -27,6 +29,13 @@ const EmployeeDirectory: React.FC = () => {
     ]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.openAddModal) {
+            setIsModalOpen(true);
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
