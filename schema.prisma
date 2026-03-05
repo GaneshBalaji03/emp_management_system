@@ -1,0 +1,270 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  HR
+  EMPLOYEE
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  EXITED
+}
+
+enum OnboardingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  VERIFIED
+  NEEDS_CHANGES
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(EMPLOYEE)
+  status        Status    @default(ACTIVE)
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  employee      Employee?
+  auditLogs     AuditLog[]
+}
+
+model Employee {
+  id                String    @id @default(uuid())
+  user              User      @relation(fields: [userId], references: [id])
+  userId            String    @unique
+  employeeCode      String    @unique
+  name              String
+  dob               DateTime?
+  doj               DateTime
+  department        Department @relation(fields: [departmentId], references: [id])
+  departmentId      String
+  designation       Designation @relation(fields: [designationId], references: [id])
+  designationId     String
+  location          Location?   @relation(fields: [locationId], references: [id])
+  locationId        String?
+  manager           Employee?   @relation("ManagerToSubordinate", fields: [managerId], references: [id])
+  managerId         String?
+  subordinates      Employee[]  @relation("ManagerToSubordinate")
+  status            Status      @default(ACTIVE)
+  personalDetails   Json?       // For flexible fields like address, bank info
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  onboarding        EmployeeOnboarding?
+  documents         EmployeeDocument[]
+  leaveBalances     LeaveBalance[]
+  leaveRequests     LeaveRequest[]
+  attendanceLogs    AttendanceLog[]
+  attendanceCorrections AttendanceCorrection[]
+  tickets           Ticket[]
+}
+
+model Department {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  employees   Employee[]
+  templates   OnboardingTemplate[]
+}
+
+model Designation {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  employees   Employee[]
+}
+
+model Location {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  employees   Employee[]
+}
+
+model OnboardingTemplate {
+  id              String           @id @default(uuid())
+  name            String
+  department      Department?      @relation(fields: [departmentId], references: [id])
+  departmentId    String?
+  tasks           OnboardingTask[]
+  enrolments      EmployeeOnboarding[]
+}
+
+model OnboardingTask {
+  id            String    @id @default(uuid())
+  template      OnboardingTemplate @relation(fields: [templateId], references: [id])
+  templateId    String
+  title         String
+  description   String?
+  sequence      Int
+  isRequired    Boolean   @default(true)
+  employeeTasks EmployeeOnboardingTask[]
+}
+
+model EmployeeOnboarding {
+  id            String    @id @default(uuid())
+  employee      Employee  @relation(fields: [employeeId], references: [id])
+  employeeId    String    @unique
+  template      OnboardingTemplate @relation(fields: [templateId], references: [id])
+  templateId    String
+  status        OnboardingStatus @default(NOT_STARTED)
+  progress      Int              @default(0)
+  tasks         EmployeeOnboardingTask[]
+}
+
+model EmployeeOnboardingTask {
+  id                    String             @id @default(uuid())
+  employeeOnboarding    EmployeeOnboarding @relation(fields: [employeeOnboardingId], references: [id])
+  employeeOnboardingId  String
+  task                  OnboardingTask     @relation(fields: [taskId], references: [id])
+  taskId                String
+  status                OnboardingStatus   @default(NOT_STARTED)
+  completedAt           DateTime?
+  notes                 String?
+}
+
+model EmployeeDocument {
+  id                String           @id @default(uuid())
+  employee          Employee         @relation(fields: [employeeId], references: [id])
+  employeeId        String
+  documentType      String           // e.g. "ID_PROOF", "PASSPORT"
+  fileUrl           String
+  status            OnboardingStatus @default(SUBMITTED)
+  verifiedBy        String?          // User ID
+  verifiedAt        DateTime?
+  rejectionReason   String?
+  version           Int              @default(1)
+  createdAt         DateTime         @default(now())
+}
+
+model LeaveType {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  yearlyLimit   Int
+  accrualRule   Json?
+  balances      LeaveBalance[]
+  requests      LeaveRequest[]
+}
+
+model LeaveBalance {
+  id            String    @id @default(uuid())
+  employee      Employee  @relation(fields: [employeeId], references: [id])
+  employeeId    String
+  leaveType     LeaveType @relation(fields: [leaveTypeId], references: [id])
+  leaveTypeId   String
+  balance       Float
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([employeeId, leaveTypeId])
+}
+
+model LeaveRequest {
+  id            String      @id @default(uuid())
+  employee      Employee    @relation(fields: [employeeId], references: [id])
+  employeeId    String
+  leaveType     LeaveType   @relation(fields: [leaveTypeId], references: [id])
+  leaveTypeId   String
+  fromDate      DateTime
+  toDate        DateTime
+  days          Float
+  reason        String
+  attachmentUrl String?
+  status        LeaveStatus @default(PENDING)
+  approverId    String?     // User ID
+  decisionAt    DateTime?
+}
+
+model AttendanceLog {
+  id            String    @id @default(uuid())
+  employee      Employee  @relation(fields: [employeeId], references: [id])
+  employeeId    String
+  date          DateTime
+  checkinTime   DateTime?
+  checkoutTime  DateTime?
+  status        String    // e.g. "PRESENT", "ABSENT", "LATE"
+  source        String?   // e.g. "WEB", "DEVICE"
+  remarks       String?
+}
+
+model AttendanceCorrection {
+  id                String    @id @default(uuid())
+  employee          Employee  @relation(fields: [employeeId], references: [id])
+  employeeId    String
+  date              DateTime
+  requestedCheckin  DateTime?
+  requestedCheckout DateTime?
+  reason            String
+  status            LeaveStatus @default(PENDING)
+  decidedBy         String?     // User ID
+  decidedAt         DateTime?
+}
+
+model Holiday {
+  id        String    @id @default(uuid())
+  date      DateTime
+  name      String
+  location  Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+}
+
+model Announcement {
+  id                String    @id @default(uuid())
+  title             String
+  body              String
+  targetRole        Role?
+  targetDepartment  String?   // Department ID
+  startDate         DateTime
+  endDate           DateTime?
+  createdAt         DateTime  @default(now())
+}
+
+model Ticket {
+  id                String       @id @default(uuid())
+  employee          Employee     @relation(fields: [employeeId], references: [id])
+  employeeId        String
+  category          String
+  subject           String
+  description       String
+  status            TicketStatus @default(OPEN)
+  assignedTo        String?      // User ID
+  createdAt         DateTime     @default(now())
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  actor         User     @relation(fields: [actorId], references: [id])
+  actorId       String
+  action        String   // e.g. "CREATE_EMPLOYEE", "APPROVE_LEAVE"
+  entityType    String   // e.g. "Employee", "LeaveRequest"
+  entityId      String
+  before        Json?
+  after         Json?
+  createdAt     DateTime @default(now())
+}
